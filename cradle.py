@@ -2,7 +2,12 @@
 # Boilerplate code for the compiler.
 
 import sys
+import pdb
 from char_ops import getch, char_range
+
+""" CONSTANTS """
+
+DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] 
 
 """ VARIABLES """
 
@@ -15,6 +20,7 @@ def get_char():
     """
     Read new character from the input stream.
     """
+    global look
     look = getch()
 
 def error(msg):
@@ -62,7 +68,7 @@ def is_digit(c):
     """
     Recognize a decimal digit.
     """
-    return c in char_range('0', '9')
+    return c in DIGITS
 
 def get_name():
     """
@@ -99,10 +105,17 @@ def emit_line(s):
     emit(s)
     print
 
-def main():
+def expression():
+    """
+    Parse and translate a math expression.
+    """
+    emit_line("MOVE {},DO".format(get_num()))
+
+def init():
     get_char()
 
 """ MAIN PROGRAM """
 
 if __name__ == "__main__":
-    main()
+    init()
+    expression()
