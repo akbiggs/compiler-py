@@ -77,9 +77,7 @@ def get_name():
     if not is_alpha(look):
         expected("Name")
 
-    result = look.upper()
-    get_char()
-    return result
+    return look.upper()
 
 def get_num():
     """
@@ -88,9 +86,7 @@ def get_num():
     if not is_digit(look):
         expected("Integer")
 
-    result = look
-    get_char()
-    return result
+    return look
 
 def emit(s):
     """
@@ -105,11 +101,56 @@ def emit_line(s):
     emit(s)
     print
 
-def expression():
+def factor():
     """
-    Parse and translate a math expression.
+    Parse and translate a math factor.
     """
     emit_line("MOVE {},DO".format(get_num()))
+    get_char()
+
+def multiply():
+    """
+    Recognize and translate a multiply.
+    """
+    match('*')
+    factor()
+    emit_line("MULS (SP)+,D0")
+
+def divide():
+    """
+    Recognize and translate a divide.
+    """
+    match('/')
+    factor()
+    emit_line("MOVE (SP)+,D1")
+    emit_line("DIVS D1,D0")
+
+def term():
+    factor()
+    while look in ['*', '/']:
+        emit_line("MOVE D0,-(SP)")
+        if look == '*': multiply()
+        elif look == '/': divide()
+        else: expected("Mulop")
+
+def add():
+    match('+')
+    term()
+    emit_line("ADD (SP)+,D0")
+
+def subtract():
+    match('-')
+    term()
+    emit_line("SUB (SP)+,D0")
+    emit_line("NEG D0")
+
+def expression():
+    term()
+    while look in ['+', '-']:
+        emit_line("MOVE D0,-(SP)")
+        if look == '+': add()
+        elif look == '-': subtract()
+        else: expected('Addop')
 
 def init():
     get_char()
