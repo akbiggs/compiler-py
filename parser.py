@@ -15,6 +15,10 @@ def get_char():
     global look
     look = getch()
 
+def skip_white():
+    while is_white(look):
+        get_char()
+
 def match(x):
     """
     Match a specific input character.
@@ -23,13 +27,20 @@ def match(x):
     """
     if look == x:
         get_char()
+        skip_white()
     else:
         expected("'{}'".format(x))
 
 def is_addop(c):
+    """
+    Return whether or not the character is an additive operator.
+    """
     return c in ['+', '-']
 
 def is_mulop(c):
+    """
+    Return whether or not the character is an multiplicative operator.
+    """
     return c in ['*', '/']
 
 def get_name():
@@ -43,7 +54,8 @@ def get_name():
     while is_alnum(look):
         token += look.upper()
         get_char()
-
+    
+    skip_white()
     return token
 
 def get_num():
@@ -58,21 +70,23 @@ def get_num():
         value += look
         get_char()
 
+    skip_white()
     return value
 
 def ident():
     """
     Parse and translate an identifier.
     """
-    name = get_name()
-    if look == '(':
-        match('(')
-        match(')')
-        emit_line("BSR " + name)
-    else:
-        emit_line("MOVE " + name + "(PC),D0")
-
-    return name
+    with stripping_whitespace():
+        name = get_name()
+        if look == '(':
+            match('(')
+            match(')')
+            emit_line("BSR " + name)
+        else:
+            emit_line("MOVE " + name + "(PC),D0")
+        
+        return name
 
 def factor():
     """
@@ -141,6 +155,7 @@ def assignment():
 
 def init():
     get_char()
+    skip_white()
 
 """ MAIN PROGRAM """
 
