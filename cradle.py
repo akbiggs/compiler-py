@@ -70,6 +70,9 @@ def is_digit(c):
     """
     return c in DIGITS
 
+def is_addop(c):
+    return c in ['+', '-']
+
 def get_name():
     """
     Get an identifier.
@@ -105,8 +108,13 @@ def factor():
     """
     Parse and translate a math factor.
     """
-    emit_line("MOVE {},DO".format(get_num()))
-    get_char()
+    if look == '(':
+        match('(')
+        expression()
+        match(')')
+    else:
+        emit_line("MOVE {},DO".format(get_num()))
+        get_char()
 
 def multiply():
     """
@@ -145,8 +153,11 @@ def subtract():
     emit_line("NEG D0")
 
 def expression():
-    term()
-    while look in ['+', '-']:
+    if is_addop(look):
+        emit_line("CLR DO")
+    else:
+        term()
+    while is_addop(look):
         emit_line("MOVE D0,-(SP)")
         if look == '+': add()
         elif look == '-': subtract()
