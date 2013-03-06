@@ -80,7 +80,9 @@ def get_name():
     if not is_alpha(look):
         expected("Name")
 
-    return look.upper()
+    result = look.upper()
+    get_char()
+    return result
 
 def get_num():
     """
@@ -89,7 +91,9 @@ def get_num():
     if not is_digit(look):
         expected("Integer")
 
-    return look
+    result = look
+    get_char()
+    return result
 
 def emit(s):
     """
@@ -109,7 +113,6 @@ def ident():
     Parse and translate an identifier.
     """
     name = get_name()
-    get_char()
     if look == '(':
         match('(')
         match(')')
@@ -131,7 +134,6 @@ def factor():
         ident()
     else:
         emit_line("MOVE {},DO".format(get_num()))
-        get_char()
 
 def multiply():
     """
@@ -156,7 +158,6 @@ def term():
         emit_line("MOVE D0,-(SP)")
         if look == '*': multiply()
         elif look == '/': divide()
-        else: expected("Mulop")
 
 def add():
     match('+')
@@ -178,7 +179,6 @@ def expression():
         emit_line("MOVE D0,-(SP)")
         if look == '+': add()
         elif look == '-': subtract()
-        else: expected('Addop')
 
 def init():
     get_char()
@@ -188,3 +188,7 @@ def init():
 if __name__ == "__main__":
     init()
     expression()
+
+    # TODO: Make this platform independent.
+    if look != '\r':
+        expected("Newline")
