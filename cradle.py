@@ -104,6 +104,21 @@ def emit_line(s):
     emit(s)
     print
 
+def ident():
+    """
+    Parse and translate an identifier.
+    """
+    name = get_name()
+    get_char()
+    if look == '(':
+        match('(')
+        match(')')
+        emit_line("BSR " + name)
+    else:
+        emit_line("MOVE " + name + "(PC),D0")
+
+    return name
+
 def factor():
     """
     Parse and translate a math factor.
@@ -112,6 +127,8 @@ def factor():
         match('(')
         expression()
         match(')')
+    elif is_alpha(look):
+        ident()
     else:
         emit_line("MOVE {},DO".format(get_num()))
         get_char()
